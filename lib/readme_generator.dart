@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:ReadmeGenerator/community_config.dart';
+import 'package:readme_generator/community_config.dart';
 import 'package:github/server.dart' as GitHub;
 import 'package:meta/meta.dart';
-import 'package:ReadmeGenerator/github_tools.dart';
+import 'package:readme_generator/github_tools.dart';
 
 class ReadmeGenerator {
   ReadmeGenerator({

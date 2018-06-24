@@ -1,7 +1,7 @@
 import 'dart:convert' as Convert;
 import 'dart:io';
 
-import 'package:ReadmeGenerator/readme_generator.dart';
+import 'package:readme_generator/readme_generator.dart';
 
 void main() async {
   print("-- Running ReadmeGenerator (${new DateTime.now()}) --");

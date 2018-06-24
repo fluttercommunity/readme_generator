@@ -1,4 +1,4 @@
-name: ReadmeGenerator
+name: readme_generator
 description: Generates the table for the README for Flutter Community.
 
 dependencies:

@@ -3,7 +3,7 @@ import 'dart:convert' as Convert;
 
 import 'package:github/server.dart' as GitHub;
 import 'package:meta/meta.dart';
-import 'package:ReadmeGenerator/github_tools.dart';
+import 'package:readme_generator/github_tools.dart';
 
 class RepositoryConfigFileError extends Error {
   RepositoryConfigFileError({
