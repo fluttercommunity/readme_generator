@@ -15,7 +15,9 @@ void main() async {
 
   print(result);
 
-  new File("result.md").writeAsStringSync(result);
+  String testFileName = "output.md";
+  new File(testFileName).delete();
+  new File(testFileName).writeAsStringSync(result);
 
   exit(0);
 }

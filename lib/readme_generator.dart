@@ -67,7 +67,7 @@ class ReadmeGenerator {
       }
     }
 
-    if (result.isNotEmpty) result = await this.getHeaderText() + result;
+    if (result.isNotEmpty) result = await this._getTableHeader() + result;
 
     return result;
   }
