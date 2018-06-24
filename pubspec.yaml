@@ -1,0 +1,6 @@
+name: ReadmeGenerator
+description: Generates the table for the README for Flutter Community.
+
+dependencies:
+  github: "^3.0.2"
+  meta: "^1.1.5"

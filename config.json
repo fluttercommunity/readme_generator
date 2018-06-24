@@ -1,0 +1,7 @@
+{
+    "organization_name": "fluttercommunity",
+    "main_repository_name": "community",
+    "repository_config_file_name": "COMMUNITY_INFO.json",
+    "markdown_table_name": "Packages",
+    "header_text_file_name": "_HEADER.md"
+}
