@@ -11,7 +11,7 @@ class RepositoryConfigFileError extends Error {
     String errorDescription,
   }) {
     this.message =
-        (this.fileNotFound) ? "File not found" : "File or JSON is invalid";
+        (this.fileNotFound) ? "File not found" : "File or YAML is invalid";
     this.message += (errorDescription != null && errorDescription.isNotEmpty)
         ? ": $message"
         : ".";
