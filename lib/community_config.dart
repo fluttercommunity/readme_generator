@@ -42,6 +42,7 @@ class RepositoryConfig {
   final String maintainerUsername;
   final String pubUrl;
   final String pubPackageName;
+  String repositoryName;
 
   factory RepositoryConfig.fromJSON(Map<String, dynamic> config) {
     return new RepositoryConfig(
@@ -74,7 +75,8 @@ class RepositoryConfig {
         throw new RepositoryConfigFileError(
             fileNotFound: false,
             errorDescription: "'is_package' field is not a bool.");
-      return new RepositoryConfig.fromJSON(config);
+
+      return new RepositoryConfig.fromJSON(config)..repositoryName = repository.name;
     } on FormatException {
       throw new RepositoryConfigFileError(fileNotFound: false);
     }

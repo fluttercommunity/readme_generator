@@ -28,9 +28,10 @@ class GitHubTools {
     return new GitHubTools(organization: organization);
   }
 
-  Future<GitHub.Repository> getRepository(String repositoryName) =>
-      this.client.repositories.getRepository(
-          new GitHub.RepositorySlug(this.organization.login, repositoryName));
+  Future<GitHub.Repository> getRepository(String repositoryName) {
+    return this.client.repositories.getRepository(
+        new GitHub.RepositorySlug(this.organization.login, repositoryName));
+  }
 
   Future<String> getFile(String url, [String fallBackString]) async {
     Http.Response response = await Http.get(url);
@@ -72,9 +73,11 @@ class GitHubTools {
   Future<List<GitHub.Repository>> getAllRepositories() async {
     String response = await this.getFile(
         "https://api.github.com/users/${this.organization.login}/repos");
-    List<Map<String, dynamic>> jsonResponse = Convert.json.decode(response);
+    List<Map<String, dynamic>> jsonResponse = List
+        .castFrom<dynamic, Map<String, dynamic>>(Convert.json.decode(response));
     List<GitHub.Repository> result = jsonResponse
-        .map((jsonRepository) => GitHub.Repository.fromJSON(jsonRepository));
+        .map((jsonRepository) => GitHub.Repository.fromJSON(jsonRepository))
+        .toList();
 
     return result;
   }

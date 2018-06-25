@@ -1,23 +1,52 @@
 import 'dart:convert' as Convert;
 import 'dart:io';
 
+import 'package:github/server.dart' as GitHub;
 import 'package:readme_generator/readme_generator.dart';
 
-void main() async {
-  print("-- Running ReadmeGenerator (${new DateTime.now()}) --");
+void main({
+  bool debugLog: true,
+  bool generateOutputFile: true,
+  String outputFileName: "output.md",
+}) async {
+  void log(String message) {
+    if (debugLog) print(message);
+  }
+
+  log("-- RUNNING ReadmeGenerator (${new DateTime.now()}) --");
   File configFile = new File("config.json");
 
   Map<String, dynamic> config =
       Convert.json.decode(await configFile.readAsString());
 
   ReadmeGenerator generator = new ReadmeGenerator.fromJSON(config);
-  String result = await generator.generateReadme();
 
-  print(result);
+  generator.enableLogging();
 
-  String testFileName = "output.md";
-  new File(testFileName).delete();
-  new File(testFileName).writeAsStringSync(result);
+  String result;
 
-  exit(0);
+  try {
+    result = await generator.generateReadme();
+  } on GitHub.UnknownError catch (e) {
+    if (e.message.contains("API rate limit")) {
+      log("GitHub rate limit reached.");
+      log("Next rate limit reset: ${e.github.rateLimitReset.toLocal()} (U ${e.github.rateLimitReset.toLocal().millisecondsSinceEpoch/1000.toInt()} sec.)");
+    } else
+      log("Unknown error: $e");
+  }
+
+  if (result != null) {
+    log("README GENERATED");
+
+    log("RESULT:\n" + result.split('\n').map((line) => "\t" + line).join('\n'));
+
+    if (generateOutputFile) {
+      File outputFile = File(outputFileName);
+      if (outputFile.existsSync()) outputFile.deleteSync();
+      outputFile.writeAsStringSync(result);
+    }
+  }
+
+  log("Exiting.");
+  exit((result != null) ? 0 : 1);
 }
