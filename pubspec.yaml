@@ -6,3 +6,4 @@ dependencies:
     git: https://github.com/kevmoo/github.dart.git
   meta: "^1.1.5"
   ansicolor: "^0.1.1"
+  yaml: "^2.1.14"

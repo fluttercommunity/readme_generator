@@ -1,12 +1,12 @@
-import 'dart:convert' as Convert;
 import 'dart:io';
 
 import 'package:github/server.dart' as GitHub;
 import 'package:readme_generator/readme_generator.dart';
+import 'package:yaml/yaml.dart' as YAML;
 
 void main({
   bool debugLog: true,
-  bool generateOutputFile: true,
+  bool generateOutputFile: false,
   String outputFileName: "output.md",
 }) async {
   void log(String message) {
@@ -14,12 +14,12 @@ void main({
   }
 
   log("-- RUNNING ReadmeGenerator (${new DateTime.now()}) --");
-  File configFile = new File("config.json");
+  File configFile = new File("config.yaml");
 
-  Map<String, dynamic> config =
-      Convert.json.decode(await configFile.readAsString());
+  YAML.YamlMap config =
+      YAML.loadYaml(configFile.readAsStringSync());
 
-  ReadmeGenerator generator = new ReadmeGenerator.fromJSON(config);
+  ReadmeGenerator generator = new ReadmeGenerator.fromYAML(config);
 
   generator.enableLogging();
 

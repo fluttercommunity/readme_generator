@@ -5,6 +5,7 @@ import 'package:github/server.dart' as GitHub;
 import 'package:meta/meta.dart';
 import 'package:readme_generator/community_config.dart';
 import 'package:readme_generator/github_tools.dart';
+import 'package:yaml/yaml.dart' as YAML;
 
 class ReadmeGenerator {
   ReadmeGenerator({
@@ -26,7 +27,7 @@ class ReadmeGenerator {
 
   GitHubTools _git;
 
-  factory ReadmeGenerator.fromJSON(Map<String, dynamic> config) {
+  factory ReadmeGenerator.fromYAML(YAML.YamlMap config) {
     return new ReadmeGenerator(
       organizationName: config["organization_name"],
       mainRepositoryName: config["main_repository_name"],
@@ -48,13 +49,13 @@ class ReadmeGenerator {
       {bool error: false, bool warn: false, bool positive: false}) {
     if (_log) {
       String text = (" " * (_logLevel * 2)) + message;
-      if (error)
-        (new AnsiPen()..red())(text);
-      else if (warn)
-        (new AnsiPen()..yellow())(text);
-      else if (warn)
-        (new AnsiPen()..green())(text);
-      else
+      // if (error)
+      //   (new AnsiPen()..red())(text);
+      // else if (warn)
+      //   (new AnsiPen()..yellow())(text);
+      // else if (warn)
+      //   (new AnsiPen()..green())(text);
+      // else
         print(text);
     }
   }
@@ -112,7 +113,7 @@ class ReadmeGenerator {
         }
       } on RepositoryConfigFileError catch (e) {
         log(
-          "Error while getting repository config for '${repository.fullName}': ${e.message}",
+          "Error while getting repository config for '${repository.name}': ${e.message}",
           error: true,
         );
         log("Skipping...", warn: true);
@@ -131,7 +132,7 @@ class ReadmeGenerator {
     indentLog();
     String result = "";
 
-    result += "## $markdownTableName\n";
+    result += "# $markdownTableName\n";
     result += "| Name | Release | Description | Maintainer |\n";
     result += "| --- | --- | --- | --- |\n";
 

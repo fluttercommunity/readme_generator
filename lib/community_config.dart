@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:convert' as Convert;
 
 import 'package:github/server.dart' as GitHub;
 import 'package:meta/meta.dart';
 import 'package:readme_generator/github_tools.dart';
+import 'package:yaml/yaml.dart' as YAML;
 
 class RepositoryConfigFileError extends Error {
   RepositoryConfigFileError({
@@ -44,7 +44,7 @@ class RepositoryConfig {
   final String pubPackageName;
   String repositoryName;
 
-  factory RepositoryConfig.fromJSON(Map<String, dynamic> config) {
+  factory RepositoryConfig.fromYAML(YAML.YamlMap config) {
     return new RepositoryConfig(
       isPackage: config["is_package"],
       maintainerName: config["maintainer_name"],
@@ -66,7 +66,7 @@ class RepositoryConfig {
     if (configString.startsWith("404"))
       throw new RepositoryConfigFileError(fileNotFound: true);
     try {
-      Map<String, dynamic> config = Convert.json.decode(configString);
+      YAML.YamlMap config = YAML.loadYaml(configString);
       if (config["is_package"] == null)
         throw new RepositoryConfigFileError(
             fileNotFound: false,
@@ -76,7 +76,7 @@ class RepositoryConfig {
             fileNotFound: false,
             errorDescription: "'is_package' field is not a bool.");
 
-      return new RepositoryConfig.fromJSON(config)..repositoryName = repository.name;
+      return new RepositoryConfig.fromYAML(config)..repositoryName = repository.name;
     } on FormatException {
       throw new RepositoryConfigFileError(fileNotFound: false);
     }
