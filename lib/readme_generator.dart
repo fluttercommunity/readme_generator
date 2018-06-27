@@ -152,7 +152,7 @@ class ReadmeGenerator {
     result +=
         "[![Pub](https://img.shields.io/pub/v/${repositoryConfig.pubPackageName ?? repositoryConfig.packageName}.svg)](" +
             ((repositoryConfig.pubUrl) ??
-                "(https://pub.dartlang.org/packages/${repositoryConfig.pubPackageName ?? repositoryConfig.packageName}") +
+                "https://pub.dartlang.org/packages/${repositoryConfig.pubPackageName ?? repositoryConfig.packageName}") +
             ") | ";
     result +=
         (repositoryConfig.packageDescription ?? "NO DESCRIPTION PROVIDED") +

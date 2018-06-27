@@ -6,7 +6,7 @@ import 'package:yaml/yaml.dart' as YAML;
 
 void main({
   bool debugLog: true,
-  bool generateOutputFile: false,
+  bool generateOutputFile: true,
   String outputFileName: "output.md",
 }) async {
   void log(String message) {
@@ -21,7 +21,7 @@ void main({
 
   ReadmeGenerator generator = new ReadmeGenerator.fromYAML(config);
 
-  generator.enableLogging();
+  if (debugLog) generator.enableLogging();
 
   String result;
 
@@ -41,7 +41,7 @@ void main({
     log("RESULT:\n" + result.split('\n').map((line) => "\t" + line).join('\n'));
 
     if (generateOutputFile) {
-      File outputFile = File(outputFileName);
+      File outputFile = new File(outputFileName);
       if (outputFile.existsSync()) outputFile.deleteSync();
       outputFile.writeAsStringSync(result);
     }
