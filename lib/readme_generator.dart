@@ -52,10 +52,13 @@ class ReadmeGenerator {
     }
   }
 
+  void initialize() async => this._git ??=
+      await GitHubTools.fromOrganizationName(this.organizationName);
+
   Future<String> generateReadme() async {
     log("Generating readme...");
     indentLog();
-    this._git ??= await GitHubTools.fromOrganizationName(this.organizationName);
+    await initialize();
     String headerText = await this.getHeaderText();
     String packageTable = await this.generateTable();
     unIndentLog();
@@ -66,7 +69,7 @@ class ReadmeGenerator {
   Future<String> generateTable() async {
     log("Generating table...");
     indentLog();
-    this._git ??= await GitHubTools.fromOrganizationName(this.organizationName);
+    await initialize();
     List<GitHub.Repository> repositoriesToParse =
         await this._git.getAllRepositories();
 
@@ -165,7 +168,7 @@ class ReadmeGenerator {
   }
 
   Future<String> getHeaderText() async {
-    this._git ??= await GitHubTools.fromOrganizationName(this.organizationName);
+    await initialize();
     return await this._git.getFileFromRepositoryByName(this.mainRepositoryName,
         fileName: this.headerTextFileName);
   }

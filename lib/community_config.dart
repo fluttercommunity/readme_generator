@@ -76,7 +76,8 @@ class RepositoryConfig {
             fileNotFound: false,
             errorDescription: "'is_package' field is not a bool.");
 
-      return new RepositoryConfig.fromYAML(config)..repositoryName = repository.name;
+      return new RepositoryConfig.fromYAML(config)
+        ..repositoryName = repository.name;
     } on FormatException {
       throw new RepositoryConfigFileError(fileNotFound: false);
     }

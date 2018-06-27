@@ -33,7 +33,7 @@ class GitHubTools {
         new GitHub.RepositorySlug(this.organization.login, repositoryName));
   }
 
-  Future<String> getFile(String url, [String fallBackString]) async {
+  static Future<String> getFile(String url, [String fallBackString]) async {
     Http.Response response = await Http.get(url);
     String result = new String.fromCharCodes(response.bodyBytes);
 
@@ -49,7 +49,7 @@ class GitHubTools {
     String branch: "master",
     String fallBackString,
   }) =>
-      this.getFile(
+      getFile(
         "https://raw.githubusercontent.com/${repository.fullName}/$branch/$fileName",
         fallBackString,
       );
@@ -71,7 +71,7 @@ class GitHubTools {
   }
 
   Future<List<GitHub.Repository>> getAllRepositories() async {
-    String response = await this.getFile(
+    String response = await getFile(
         "https://api.github.com/users/${this.organization.login}/repos");
     List<Map<String, dynamic>> jsonResponse = List
         .castFrom<dynamic, Map<String, dynamic>>(Convert.json.decode(response));
