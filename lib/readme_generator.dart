@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:ansicolor/ansicolor.dart';
 import 'package:github/server.dart' as GitHub;
 import 'package:meta/meta.dart';
 import 'package:readme_generator/community_config.dart';
@@ -49,13 +48,6 @@ class ReadmeGenerator {
       {bool error: false, bool warn: false, bool positive: false}) {
     if (_log) {
       String text = (" " * (_logLevel * 2)) + message;
-      // if (error)
-      //   (new AnsiPen()..red())(text);
-      // else if (warn)
-      //   (new AnsiPen()..yellow())(text);
-      // else if (warn)
-      //   (new AnsiPen()..green())(text);
-      // else
       print(text);
     }
   }
