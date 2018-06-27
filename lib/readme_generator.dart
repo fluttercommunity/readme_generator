@@ -16,11 +16,11 @@ class ReadmeGenerator {
     @required this.headerTextFileName,
   });
 
-  final String organizationName;
-  final String mainRepositoryName;
-  final String repositoryConfigFileName;
-  final String markdownTableName;
-  final String headerTextFileName;
+  final String organizationName,
+      mainRepositoryName,
+      repositoryConfigFileName,
+      markdownTableName,
+      headerTextFileName;
 
   bool _log = false;
   int _logLevel = 0;
@@ -56,7 +56,7 @@ class ReadmeGenerator {
       // else if (warn)
       //   (new AnsiPen()..green())(text);
       // else
-        print(text);
+      print(text);
     }
   }
 
@@ -176,5 +176,17 @@ class ReadmeGenerator {
     this._git ??= await GitHubTools.fromOrganizationName(this.organizationName);
     return await this._git.getFileFromRepositoryByName(this.mainRepositoryName,
         fileName: this.headerTextFileName);
+  }
+
+  void uploadReadmeToRepository({
+    @required String contents,
+    @required String accessToken,
+  }) async {
+    // GitHub.GitHub authenticatedClient = new GitHub.GitHub(
+    //     auth: new GitHub.Authentication.withToken(accessToken));
+    // GitHub.Repository repository = await authenticatedClient.repositories
+    //     .getRepository(new GitHub.RepositorySlug(
+    //         this.organizationName, this.mainRepositoryName));
+    // repository.
   }
 }

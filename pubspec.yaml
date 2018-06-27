@@ -2,8 +2,8 @@ name: readme_generator
 description: Generates the table for the README for Flutter Community.
 
 dependencies:
-  github: 
-    git: https://github.com/kevmoo/github.dart.git
+  github:
+    git: https://github.com/fluttercommunity/github.dart.git
   meta: "^1.1.5"
   ansicolor: "^0.1.1"
   yaml: "^2.1.14"

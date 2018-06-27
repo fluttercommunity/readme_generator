@@ -45,6 +45,9 @@ void main({
       if (outputFile.existsSync()) outputFile.deleteSync();
       outputFile.writeAsStringSync(result);
     }
+
+    log("Uploading to git...");
+    generator.uploadReadmeToRepository(contents: result, accessToken: "20168ac9e90d045e9604fd3e66821dbe495da326");
   }
 
   log("Exiting.");
