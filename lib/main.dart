@@ -47,7 +47,7 @@ void main({
     }
 
     log("Uploading to git...");
-    generator.uploadReadmeToRepository(contents: result, accessToken: "20168ac9e90d045e9604fd3e66821dbe495da326");
+    generator.uploadReadmeToRepository(contents: result, accessToken: "oops");
   }
 
   log("Exiting.");
