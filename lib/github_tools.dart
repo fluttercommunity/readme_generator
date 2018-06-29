@@ -16,8 +16,9 @@ class GitHubTools {
   static Future<GitHubTools> fromOrganizationName(
           String organizationName) async =>
       new GitHubTools(
-          organization:
-              await new GitHub.GitHub().organizations.get(organizationName));
+        organization:
+            await new GitHub.GitHub().organizations.get(organizationName),
+      );
 
   static Future<GitHubTools> fromRepository(
       GitHub.Repository repository) async {

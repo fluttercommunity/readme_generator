@@ -23,36 +23,37 @@ class RepositoryConfigFileError extends Error {
 
 class RepositoryConfig {
   RepositoryConfig({
-    @required this.isPackage,
+    this.ignore: false,
     this.packageName,
     this.packageDescription,
     this.maintainerName,
     this.maintainerUsername,
-    this.pubUrl,
-    this.pubPackageName,
   }) {
-    if (isPackage == false)
-      assert(packageName != null && packageName.isNotEmpty);
+    if (ignore == false) assert(packageName != null && packageName.isNotEmpty);
   }
 
-  final bool isPackage;
+  final bool ignore;
   final String packageName;
   final String packageDescription;
   final String maintainerName;
   final String maintainerUsername;
-  final String pubUrl;
-  final String pubPackageName;
   String repositoryName;
 
   factory RepositoryConfig.fromYAML(YAML.YamlMap config) {
+    Map<String, String> maintainerData = {};
+    if (config["maintainer"] != null &&
+        (config["maintainer"] as String).isNotEmpty) {
+      maintainerData = RepositoryConfig.getMaintainerInfo(
+        data: config["maintainer"] as String,
+      );
+    }
+
     return new RepositoryConfig(
-      isPackage: config["is_package"],
-      maintainerName: config["maintainer_name"],
-      maintainerUsername: config["maintainer_username"],
-      packageDescription: config["package_description"],
-      packageName: config["package_name"],
-      pubUrl: config["pub_url"],
-      pubPackageName: config["pub_package_name"],
+      ignore: config["ignore"] ?? false,
+      maintainerName: maintainerData["name"],
+      maintainerUsername: maintainerData["username"],
+      packageDescription: config["description"],
+      packageName: config["name"],
     );
   }
 
@@ -63,23 +64,35 @@ class RepositoryConfig {
     GitHubTools temporaryTools = await GitHubTools.fromRepository(repository);
     String configString = await temporaryTools.getFileFromRepository(repository,
         fileName: configFileName);
-    if (configString.startsWith("404"))
+    if (configString.startsWith("404")) {
       throw new RepositoryConfigFileError(fileNotFound: true);
+    }
     try {
       YAML.YamlMap config = YAML.loadYaml(configString);
-      if (config["is_package"] == null)
-        throw new RepositoryConfigFileError(
-            fileNotFound: false,
-            errorDescription: "'is_package' field not defined.");
-      if (config["is_package"] is! bool)
-        throw new RepositoryConfigFileError(
-            fileNotFound: false,
-            errorDescription: "'is_package' field is not a bool.");
-
       return new RepositoryConfig.fromYAML(config)
         ..repositoryName = repository.name;
     } on FormatException {
       throw new RepositoryConfigFileError(fileNotFound: false);
     }
+  }
+
+  static Map<String, String> getMaintainerInfo({
+    @required String data,
+  }) {
+    String name, username;
+    try {
+      name = data.substring(0, data.indexOf("(") - 1).trim();
+      int usernameStartIndex =
+          ((data.contains("@")) ? data.indexOf("@") : data.indexOf("(")) + 1;
+      username = data.substring(usernameStartIndex, data.indexOf(")") - 1);
+    } catch (e) {
+      name = null;
+      username = null;
+    }
+
+    return {
+      "name": name,
+      "username": username,
+    };
   }
 }

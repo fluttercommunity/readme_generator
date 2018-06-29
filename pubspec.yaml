@@ -1,6 +1,7 @@
 name: readme_generator
 description: Generates the table for the README for Flutter Community.
-maintainer:
+maintainer: Jeroen Meijer (@jeroen-meijer)
+ignore: true
 
 dependencies:
   github:

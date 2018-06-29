@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:github/server.dart' as GitHub;
 import 'package:meta/meta.dart';
-import 'package:readme_generator/community_config.dart';
+import 'package:readme_generator/repository_config.dart';
 import 'package:readme_generator/github_tools.dart';
 import 'package:yaml/yaml.dart' as YAML;
 
@@ -91,28 +91,28 @@ class ReadmeGenerator {
     for (GitHub.Repository repository in repositories) {
       log("- " + repository.name);
       indentLog();
+      log("Getting repository config...");
       try {
-        log("Getting repository config...");
         RepositoryConfig repositoryConfig =
             await RepositoryConfig.fromRepository(
           repository,
           configFileName: this.repositoryConfigFileName,
         );
-        log("Done getting repository config...", positive: true);
-        log("'is_package': ${repositoryConfig.isPackage}");
-        if (repositoryConfig.isPackage) {
-          log("Generating table row...");
-          result += _getTableRow(repositoryConfig: repositoryConfig);
-        } else {
+        log("Repository config received.");
+        log("Generating table row...");
+        log("'ignore': ${repositoryConfig.ignore}");
+
+        if (repositoryConfig.ignore)
           log("Skipping...");
-        }
+        else
+          result += _getTableRow(repositoryConfig: repositoryConfig);
       } on RepositoryConfigFileError catch (e) {
-        log(
-          "Error while getting repository config for '${repository.name}': ${e.message}",
-          error: true,
-        );
-        log("Skipping...", warn: true);
+        log("Error getting repository config: ${e.message}.");
+        if (e.fileNotFound)
+          log("Assuming '${repository.name}' is not a package.");
+        log("Skipping...");
       }
+
       unIndentLog();
     }
     if (result.isNotEmpty) result = await this._getTableHeader() + result;
@@ -145,10 +145,7 @@ class ReadmeGenerator {
     result +=
         "[**${repositoryConfig.packageName}**](${this._git.organization.htmlUrl}/${repositoryConfig.repositoryName ?? repositoryConfig.packageName}) | ";
     result +=
-        "[![Pub](https://img.shields.io/pub/v/${repositoryConfig.pubPackageName ?? repositoryConfig.packageName}.svg)](" +
-            ((repositoryConfig.pubUrl) ??
-                "https://pub.dartlang.org/packages/${repositoryConfig.pubPackageName ?? repositoryConfig.packageName}") +
-            ") | ";
+        "[![Pub](https://img.shields.io/pub/v/${repositoryConfig.packageName}.svg)](https://pub.dartlang.org/packages/${repositoryConfig.packageName}) | ";
     result +=
         (repositoryConfig.packageDescription ?? "NO DESCRIPTION PROVIDED") +
             " | ";

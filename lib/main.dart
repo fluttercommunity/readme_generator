@@ -46,8 +46,8 @@ void main({
       outputFile.writeAsStringSync(result);
     }
 
-    log("Uploading to git...");
-    generator.uploadReadmeToRepository(contents: result, accessToken: "oops");
+    // log("Uploading to git...");
+    // generator.uploadReadmeToRepository(contents: result, accessToken: "oops");
   }
 
   log("Exiting.");
