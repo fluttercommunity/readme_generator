@@ -4,6 +4,9 @@ version: 1.0.0
 maintainer: Jeroen Meijer (@jeroen-meijer)
 ignore: true
 
+environment:
+  sdk: '>=2.0.0 <3.0.0'
+
 dependencies:
   github: ^4.0.0
   quiver: ^2.0.0+1

@@ -1,6 +1,6 @@
 # - General Configuration -
 github_authorization_token_name: GITHUB_AUTHORIZATION_TOKEN
-use_output_file_as_generated_readme: true
+use_output_file_as_generated_readme: false
 
 # - GitHub Configuration -
 organization_name: fluttercommunity
