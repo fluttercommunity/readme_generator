@@ -68,6 +68,7 @@ class GitHubTools {
       repository,
       fileName: fileName,
       fallBackString: fallBackString,
+      branch: branch,
     );
   }
 

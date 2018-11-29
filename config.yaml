@@ -1,5 +1,17 @@
+# - General Configuration -
+github_authorization_token_name: GITHUB_AUTHORIZATION_TOKEN
+use_output_file_as_generated_readme: true
+
+# - GitHub Configuration -
 organization_name: fluttercommunity
 main_repository_name: community
+main_repository_branch: master
 repository_config_file_name: pubspec.yaml
-markdown_table_name: Packages
-header_text_file_name: _HEADER.md
+# markdown_table_name: Packages
+readme_file_name: README.md
+resources_repository_branch: resources
+committer_name: Flutter Community Bot
+committer_email: fluttercommunitybot@gmail.com
+commit_comment: Automated README and package table update.
+header_text_file_name: .README_TEMPLATE
+header_replace_keyword: "<PACKAGETABLE>"
