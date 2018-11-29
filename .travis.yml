@@ -2,5 +2,4 @@ language: dart
 dart:
   - stable
 
-dart_task:
-  - test: --platform vm
+script: dart lib/main.dart
