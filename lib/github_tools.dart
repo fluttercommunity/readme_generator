@@ -75,8 +75,7 @@ class GitHubTools {
   Future<List<GitHub.Repository>> getAllRepositories() async {
     String response = await getFile(
         "https://api.github.com/users/${this.organization.login}/repos");
-    List<Map<String, dynamic>> jsonResponse = List
-        .castFrom<dynamic, Map<String, dynamic>>(Convert.json.decode(response));
+    List<Map> jsonResponse = List.castFrom<dynamic, Map>(Convert.json.decode(response)).toList();
     List<GitHub.Repository> result = jsonResponse
         .map((jsonRepository) => GitHub.Repository.fromJSON(jsonRepository))
         .toList();
