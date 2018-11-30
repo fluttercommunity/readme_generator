@@ -12,6 +12,6 @@ readme_file_name: README.md
 resources_repository_branch: resources
 committer_name: Flutter Community Bot
 committer_email: fluttercommunitybot@gmail.com
-commit_comment: Automated README and package table update.
+commit_comment: Scheduled automated README and package table update.
 header_text_file_name: .README_TEMPLATE
 header_replace_keyword: "<PACKAGETABLE>"

@@ -265,7 +265,7 @@ class ReadmeGenerator {
       "Accept": "application/vnd.github.v3.full+json-X POST",
     }, body: """
 {
-  "message": "${this.config.commitComment} (${new DateTime.now()})",
+  "message": "${this.config.commitComment} (${new DateTime.now().toUtc()} UTC)",
   "committer": {
     "name": "${this.config.committerName}",
     "email": "${this.config.committerEmail}"

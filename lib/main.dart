@@ -15,7 +15,7 @@ void main({
     if (debugLog) print("-- $message --");
   }
 
-  log("ReadmeGenerator (${new DateTime.now()})");
+  log("ReadmeGenerator (${new DateTime.now().toUtc()} UTC)");
 
   String ipAddress = await GitHubTools.getFile("http://icanhazip.com/");
   log("IP: ${ipAddress.trim()}");
