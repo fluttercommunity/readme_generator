@@ -84,7 +84,7 @@ class RepositoryConfig {
       name = data.substring(0, data.indexOf("(") - 1).trim();
       int usernameStartIndex =
           ((data.contains("@")) ? data.indexOf("@") : data.indexOf("(")) + 1;
-      username = data.substring(usernameStartIndex, data.indexOf(")") - 1);
+      username = data.substring(usernameStartIndex, data.indexOf(")"));
     } catch (e) {
       name = null;
       username = null;
