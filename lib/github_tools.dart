@@ -1,70 +1,65 @@
 import 'dart:async';
-import 'dart:convert' as Convert;
+import 'dart:convert' as convert;
 
-import 'package:github/server.dart' as GitHub;
-import 'package:http/http.dart' as Http;
+import 'package:github/server.dart' as github;
+import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 
 class GitHubTools {
   GitHubTools({
     @required this.organization,
-  }) : this.client = new GitHub.GitHub();
+  }) : client = github.GitHub();
 
-  final GitHub.GitHub client;
-  final GitHub.Organization organization;
+  final github.GitHub client;
+  final github.Organization organization;
 
-  static Future<GitHubTools> fromOrganizationName(
-          String organizationName) async =>
-      new GitHubTools(
-        organization:
-            await new GitHub.GitHub().organizations.get(organizationName),
+  static Future<GitHubTools> fromOrganizationName(String organizationName) async => GitHubTools(
+        organization: await github.GitHub().organizations.get(organizationName),
       );
 
-  static Future<GitHubTools> fromRepository(
-      GitHub.Repository repository) async {
-    GitHub.GitHub temporaryClient = new GitHub.GitHub();
-    String organizationName = repository.owner.login;
-    GitHub.Organization organization =
-        await temporaryClient.organizations.get(organizationName);
-    return new GitHubTools(organization: organization);
+  static Future<GitHubTools> fromRepository(github.Repository repository) async {
+    final temporaryClient = github.GitHub();
+    final organizationName = repository.owner.login;
+    final organization = await temporaryClient.organizations.get(organizationName);
+    return GitHubTools(organization: organization);
   }
 
-  Future<GitHub.Repository> getRepository(String repositoryName) {
-    return this.client.repositories.getRepository(
-        new GitHub.RepositorySlug(this.organization.login, repositoryName));
+  Future<github.Repository> getRepository(String repositoryName) {
+    return client.repositories.getRepository(github.RepositorySlug(organization.login, repositoryName));
   }
 
   static Future<String> getFile(String url, [String fallBackString]) async {
-    Http.Response response = await Http.get(url);
-    String result = new String.fromCharCodes(response.bodyBytes);
+    final response = await http.get(url);
+    final result = String.fromCharCodes(response.bodyBytes);
 
-    if (result.startsWith("404") && fallBackString != null)
+    if (result.startsWith('404') && fallBackString != null) {
       return fallBackString;
+    }
 
     return result;
   }
 
   Future<String> getFileFromRepository(
-    GitHub.Repository repository, {
+    github.Repository repository, {
     @required String fileName,
-    String branch: "master",
+    String branch = 'master',
     String fallBackString,
   }) =>
       getFile(
-        "https://raw.githubusercontent.com/${repository.fullName}/$branch/$fileName",
+        'https://raw.githubusercontent.com/${repository.fullName}/$branch/$fileName',
         fallBackString,
       );
 
   Future<String> getFileFromRepositoryByName(
     String repositoryName, {
     @required String fileName,
-    String branch: "master",
+    String branch = 'master',
     String fallBackString,
   }) async {
-    GitHub.Repository repository = await this.client.repositories.getRepository(
-        new GitHub.RepositorySlug(this.organization.login, repositoryName));
+    final repository =
+        await client.repositories.getRepository(github.RepositorySlug(organization.login, repositoryName));
 
-    return await this.getFileFromRepository(
+    return getFileFromRepository(
       repository,
       fileName: fileName,
       fallBackString: fallBackString,
@@ -72,13 +67,11 @@ class GitHubTools {
     );
   }
 
-  Future<List<GitHub.Repository>> getAllRepositories() async {
-    String response = await getFile(
-        "https://api.github.com/users/${this.organization.login}/repos");
-    List<Map> jsonResponse = List.castFrom<dynamic, Map>(Convert.json.decode(response)).toList();
-    List<GitHub.Repository> result = jsonResponse
-        .map((jsonRepository) => GitHub.Repository.fromJSON(jsonRepository))
-        .toList();
+  Future<List<github.Repository>> getAllRepositories() async {
+    final response = await getFile('https://api.github.com/users/${organization.login}/repos');
+    final jsonResponse = List.castFrom<dynamic, Map>(convert.json.decode(response)).toList();
+    // ignore: unnecessary_lambdas
+    final result = jsonResponse.map((jsonRepository) => github.Repository.fromJSON(jsonRepository)).toList();
 
     return result;
   }

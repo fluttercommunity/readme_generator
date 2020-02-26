@@ -2,21 +2,21 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
-import 'package:github/server.dart' as GitHub;
+import 'package:github/server.dart' as github;
 import 'package:http/http.dart';
 import 'package:meta/meta.dart';
 import 'package:readme_generator/repository_config.dart';
 import 'package:readme_generator/github_tools.dart';
-import 'package:yaml/yaml.dart' as YAML;
+import 'package:yaml/yaml.dart' as yaml;
 
 class ReadmeGeneratorUploadError extends Error {
   ReadmeGeneratorUploadError(this.response) {
     switch (response.statusCode) {
-      case (200):
-        this.message = "Nothing went wrong. Exception accidentally thrown.";
+      case 200:
+        message = 'Nothing went wrong. Exception accidentally thrown.';
         break;
       default:
-        this.message = "${response.reasonPhrase}";
+        message = '${response.reasonPhrase}';
     }
   }
 
@@ -56,22 +56,20 @@ class ReadmeGeneratorConfig {
   final String committerEmail;
   final String commitComment;
 
-  factory ReadmeGeneratorConfig.fromYAML(YAML.YamlMap config) {
+  factory ReadmeGeneratorConfig.fromYAML(yaml.YamlMap config) {
     return ReadmeGeneratorConfig(
-      organizationName: config["organization_name"],
-      mainRepositoryName: config["main_repository_name"],
-      mainRepositoryBranch: config["main_repository_branch"] ?? "master",
-      repositoryConfigFileName:
-          config["repository_config_file_name"] ?? "pubspec.yaml",
-      markdownTableName: config["markdown_table_name"],
-      readmeFileName: config["readme_file_name"] ?? "README.md",
-      resourcesRepositoryBranch:
-          config["resources_repository_branch"] ?? "master",
-      headerTextFileName: config["header_text_file_name"],
-      headerReplaceKeyword: config["header_replace_keyword"],
-      committerName: config["committer_name"],
-      committerEmail: config["committer_email"],
-      commitComment: config["commit_comment"] ?? "Updated README.",
+      organizationName: config['organization_name'],
+      mainRepositoryName: config['main_repository_name'],
+      mainRepositoryBranch: config['main_repository_branch'] ?? 'master',
+      repositoryConfigFileName: config['repository_config_file_name'] ?? 'pubspec.yaml',
+      markdownTableName: config['markdown_table_name'],
+      readmeFileName: config['readme_file_name'] ?? 'README.md',
+      resourcesRepositoryBranch: config['resources_repository_branch'] ?? 'master',
+      headerTextFileName: config['header_text_file_name'],
+      headerReplaceKeyword: config['header_replace_keyword'],
+      committerName: config['committer_name'],
+      committerEmail: config['committer_email'],
+      commitComment: config['commit_comment'] ?? 'Updated README.',
     );
   }
 }
@@ -86,8 +84,8 @@ class ReadmeGenerator {
 
   GitHubTools _git;
 
-  factory ReadmeGenerator.fromYAML(YAML.YamlMap config) {
-    return new ReadmeGenerator(ReadmeGeneratorConfig.fromYAML(config));
+  factory ReadmeGenerator.fromYAML(yaml.YamlMap config) {
+    return ReadmeGenerator(ReadmeGeneratorConfig.fromYAML(config));
   }
 
   void enableLogging() => _log = true;
@@ -98,135 +96,147 @@ class ReadmeGenerator {
 
   void unIndentLog() => _logLevel -= (_logLevel <= 0) ? 0 : 1;
 
-  void log(String message,
-      {bool error: false, bool warn: false, bool positive: false}) {
+  void log(
+    String message, {
+    bool error = false,
+    bool warn = false,
+    bool positive = false,
+  }) {
     if (_log) {
-      String text = (" " * (_logLevel * 2)) + message;
+      final text = (' ' * (_logLevel * 2)) + message;
       print(text);
     }
   }
 
-  void initialize() async => this._git ??=
-      await GitHubTools.fromOrganizationName(this.config.organizationName);
+  Future<void> initialize() async {
+    return _git ??= await GitHubTools.fromOrganizationName(config.organizationName);
+  }
 
   Future<String> generateReadme() async {
-    log("Generating readme...");
+    log('Generating readme...');
     indentLog();
+
     await initialize();
-    String headerText = await this.getHeaderText();
-    String packageTable = await this.generateTable();
+
+    final headerText = await getHeaderText();
+    final packageTable = await generateTable();
+
     unIndentLog();
-    log("Done generating readme.", positive: true);
-    return headerText.replaceFirst(
-        this.config.headerReplaceKeyword, packageTable);
+
+    log('Done generating readme.', positive: true);
+
+    return headerText.replaceFirst(config.headerReplaceKeyword, packageTable);
   }
 
   Future<String> generateTable() async {
-    log("Generating table...");
+    log('Generating table...');
     indentLog();
-    await initialize();
-    List<GitHub.Repository> repositoriesToParse =
-        await this._git.getAllRepositories();
 
-    String result =
-        await this._generateTableForRepositories(repositoriesToParse);
+    await initialize();
+
+    final repositoriesToParse = await _git.getAllRepositories();
+
+    final result = await _generateTableForRepositories(repositoriesToParse);
 
     unIndentLog();
-    log("Done generating table.", positive: true);
+
+    log('Done generating table.', positive: true);
+
     return result;
   }
 
-  Future<String> _generateTableForRepositories(
-      List<GitHub.Repository> repositories) async {
+  Future<String> _generateTableForRepositories(List<github.Repository> repositories) async {
     log("Generating table for repositories\n\t${repositories.map<String>((repository) => repository.name).join(', ')}...");
-    log("(Repository config file name: '${this.config.repositoryConfigFileName}')");
+    log("(Repository config file name: '${config.repositoryConfigFileName}')");
     indentLog();
-    String result = "";
 
-    for (GitHub.Repository repository in repositories) {
-      log("- " + repository.name);
+    var result = '';
+
+    for (final repository in repositories) {
+      log('- ${repository.name}');
       indentLog();
-      log("Getting repository config...");
+      log('Getting repository config...');
       try {
-        RepositoryConfig repositoryConfig =
-            await RepositoryConfig.fromRepository(
+        final repositoryConfig = await RepositoryConfig.fromRepository(
           repository,
-          configFileName: this.config.repositoryConfigFileName,
+          configFileName: config.repositoryConfigFileName,
         );
-        log("Repository config received.");
-        log("Generating table row...");
+        log('Repository config received.');
+        log('Generating table row...');
         log("'ignore': ${repositoryConfig.ignore}");
 
-        if (repositoryConfig.ignore)
-          log("Skipping...");
-        else
+        if (repositoryConfig.ignore) {
+          log('Skipping...');
+        } else {
           result += _getTableRow(repositoryConfig: repositoryConfig);
+        }
       } on RepositoryConfigFileError catch (e) {
-        log("Error getting repository config: ${e.message}.");
-        if (e.fileNotFound)
+        log('Error getting repository config: ${e.message}.');
+        if (e.fileNotFound) {
           log("Assuming '${repository.name}' is not a package.");
-        log("Skipping...");
+        }
+        log('Skipping...');
       }
 
       unIndentLog();
     }
-    if (result.isNotEmpty) result = await this._getTableHeader() + result;
+    if (result.isNotEmpty) {
+      result = _getTableHeader() + result;
+    }
 
     unIndentLog();
-    log("Done generating table for repositories.", positive: true);
+    log('Done generating table for repositories.', positive: true);
     return result;
   }
 
   String _getTableHeader() {
-    log("Generating table header...");
+    log('Generating table header...');
     indentLog();
-    String result = "";
+    var result = '';
 
-    if (this.config.markdownTableName != null)
-      result += "# ${this.config.markdownTableName}\n";
-    result += "| Name | Release | Description | Maintainer |\n";
-    result += "| --- | --- | --- | --- |\n";
+    if (config.markdownTableName != null) {
+      result += '# ${config.markdownTableName}\n';
+    }
+    result += '| Name | Release | Description | Maintainer |\n';
+    result += '| --- | --- | --- | --- |\n';
 
     unIndentLog();
-    log("Done generating table header...", positive: true);
+    log('Done generating table header...', positive: true);
     return result;
   }
 
   String _getTableRow({@required RepositoryConfig repositoryConfig}) {
-    log("Generating table row...");
+    log('Generating table row...');
     indentLog();
 
-    String result = "| ";
+    var result = '| ';
 
     result +=
-        "[**${repositoryConfig.packageName}**](${this._git.organization.htmlUrl}/${repositoryConfig.repositoryName ?? repositoryConfig.packageName}) | ";
+        '[**${repositoryConfig.packageName}**](${_git.organization.htmlUrl}/${repositoryConfig.repositoryName ?? repositoryConfig.packageName}) | ';
     result +=
-        "[![Pub](https://img.shields.io/pub/v/${repositoryConfig.packageName}.svg)](https://pub.dartlang.org/packages/${repositoryConfig.packageName}) | ";
-    result +=
-        (repositoryConfig.packageDescription ?? "NO DESCRIPTION PROVIDED") +
-            " | ";
+        '[![Pub](https://img.shields.io/pub/v/${repositoryConfig.packageName}.svg)](https://pub.dartlang.org/packages/${repositoryConfig.packageName}) | ';
+    result += '${repositoryConfig.packageDescriptionEscaped ?? 'NO DESCRIPTION PROVIDED'} | ';
     if (repositoryConfig.maintainerUsername != null) {
-      result +=
-          "[${repositoryConfig.maintainerName ?? repositoryConfig.maintainerUsername}]";
-      result += "(https://github.com/${repositoryConfig.maintainerUsername})";
+      result += '[${repositoryConfig.maintainerName ?? repositoryConfig.maintainerUsername}]';
+      result += '(https://github.com/${repositoryConfig.maintainerUsername})';
     } else {
-      result += repositoryConfig.maintainerName ?? "NO MAINTAINER PROVIDED";
+      result += repositoryConfig.maintainerName ?? 'NO MAINTAINER PROVIDED';
     }
 
-    result += "\n";
+    result += '\n';
 
     unIndentLog();
-    log("Done generating table row...", positive: true);
+    log('Done generating table row...', positive: true);
     return result;
   }
 
   Future<String> getHeaderText() async {
     await initialize();
-    return await this._git.getFileFromRepositoryByName(
-          this.config.mainRepositoryName,
-          fileName: this.config.headerTextFileName,
-          branch: this.config.resourcesRepositoryBranch,
-        );
+    return _git.getFileFromRepositoryByName(
+      config.mainRepositoryName,
+      fileName: config.headerTextFileName,
+      branch: config.resourcesRepositoryBranch,
+    );
   }
 
   Future<Response> uploadReadmeToRepository({
@@ -234,52 +244,39 @@ class ReadmeGenerator {
     @required String authorizationToken,
   }) async {
     await initialize();
-    GitHub.Repository repository =
-        await this._git.getRepository(this.config.mainRepositoryName);
-    final String readmeFileUrl =
-        "https://api.github.com/repos/${repository.fullName}/contents/${this.config.readmeFileName}";
-    final Response readmeFileInfoRes = await this
-        ._git
-        .client
-        .client
-        .get("$readmeFileUrl?ref=${this.config.mainRepositoryBranch}");
-    final Map<String, dynamic> readmeFileInfo =
-        json.decode(readmeFileInfoRes.body);
+    final repository = await _git.getRepository(config.mainRepositoryName);
+    final readmeFileUrl = 'https://api.github.com/repos/${repository.fullName}/contents/${config.readmeFileName}';
+    final readmeFileInfoRes = await _git.client.client.get('$readmeFileUrl?ref=${config.mainRepositoryBranch}');
+    final readmeFileInfo = json.decode(readmeFileInfoRes.body);
 
-    String readmeFileSha;
+    final readmeFileSha = readmeFileInfo['sha'] ?? sha1.convert(utf8.encode(content)).toString();
 
-    if (readmeFileInfo.containsKey("sha")) {
-      readmeFileSha = readmeFileInfo["sha"];
-    } else {
-      readmeFileSha = sha1.convert(utf8.encode(content)).toString();
-    }
+    final encodedContent = base64.encode(utf8.encode(content));
 
-    final String encodedContent = base64.encode(utf8.encode(content));
-
-    final Response res = await this
-        ._git
-        .client
-        .client
-        .put(readmeFileUrl, headers: <String, String>{
-      "Authorization": authorizationToken,
-      "Accept": "application/vnd.github.v3.full+json-X POST",
-    }, body: """
+    final res = await _git.client.client.put(
+      readmeFileUrl,
+      headers: <String, String>{
+        'Authorization': authorizationToken,
+        'Accept': 'application/vnd.github.v3.full+json-X POST',
+      },
+      body: '''
 {
-  "message": "${this.config.commitComment} (${new DateTime.now().toUtc()} UTC)",
+  "message": "${config.commitComment} (${DateTime.now().toUtc()} UTC)",
   "committer": {
-    "name": "${this.config.committerName}",
-    "email": "${this.config.committerEmail}"
+    "name": "${config.committerName}",
+    "email": "${config.committerEmail}"
   },
   "content": "$encodedContent",
   "sha": "$readmeFileSha",
-  "branch": "${this.config.mainRepositoryBranch}"
+  "branch": "${config.mainRepositoryBranch}"
 }
-      """);
+      ''',
+    );
 
     if (res.statusCode != 200) {
-      throw new ReadmeGeneratorUploadError(res);
+      throw ReadmeGeneratorUploadError(res);
     }
-    final Map<String, dynamic> responseData = json.decode(res.body);
+    final responseData = json.decode(res.body) as Map<String, dynamic>;
     log("Uploaded! URL: ${responseData["content"]["html_url"]}");
     return res;
   }
