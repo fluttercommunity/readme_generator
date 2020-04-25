@@ -13,9 +13,11 @@ class GitHubTools {
   final github.GitHub client;
   final github.Organization organization;
 
-  static Future<GitHubTools> fromOrganizationName(String organizationName) async => GitHubTools(
-        organization: await github.GitHub().organizations.get(organizationName),
-      );
+  static Future<GitHubTools> fromOrganizationName(String organizationName) async {
+    return GitHubTools(
+      organization: await github.GitHub().organizations.get(organizationName),
+    );
+  }
 
   static Future<GitHubTools> fromRepository(github.Repository repository) async {
     final temporaryClient = github.GitHub();
@@ -44,11 +46,12 @@ class GitHubTools {
     @required String fileName,
     String branch = 'master',
     String fallBackString,
-  }) =>
-      getFile(
-        'https://raw.githubusercontent.com/${repository.fullName}/$branch/$fileName',
-        fallBackString,
-      );
+  }) {
+    return getFile(
+      'https://raw.githubusercontent.com/${repository.fullName}/$branch/$fileName',
+      fallBackString,
+    );
+  }
 
   Future<String> getFileFromRepositoryByName(
     String repositoryName, {
@@ -56,8 +59,9 @@ class GitHubTools {
     String branch = 'master',
     String fallBackString,
   }) async {
-    final repository =
-        await client.repositories.getRepository(github.RepositorySlug(organization.login, repositoryName));
+    final repository = await client.repositories.getRepository(
+      github.RepositorySlug(organization.login, repositoryName),
+    );
 
     return getFileFromRepository(
       repository,
@@ -67,11 +71,18 @@ class GitHubTools {
     );
   }
 
-  Future<List<github.Repository>> getAllRepositories() async {
+  Future<List<github.Repository>> getAllRepositories({
+    bool excludePrivate = false,
+  }) async {
     final response = await getFile('https://api.github.com/users/${organization.login}/repos');
     final jsonResponse = List.castFrom<dynamic, Map>(convert.json.decode(response)).toList();
     // ignore: unnecessary_lambdas
-    final result = jsonResponse.map((jsonRepository) => github.Repository.fromJSON(jsonRepository)).toList();
+    final result = jsonResponse.map((jsonRepository) => github.Repository.fromJSON(jsonRepository)).where((repository) {
+      if (!excludePrivate) {
+        return true;
+      }
+      return !repository.isPrivate;
+    }).toList();
 
     return result;
   }

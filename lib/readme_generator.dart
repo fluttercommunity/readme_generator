@@ -134,7 +134,7 @@ class ReadmeGenerator {
 
     await initialize();
 
-    final repositoriesToParse = await _git.getAllRepositories();
+    final repositoriesToParse = await _git.getAllRepositories(excludePrivate: true);
 
     final result = await _generateTableForRepositories(repositoriesToParse);
 
