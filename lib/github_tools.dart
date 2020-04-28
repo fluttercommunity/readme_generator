@@ -74,7 +74,7 @@ class GitHubTools {
   Future<List<github.Repository>> getAllRepositories({
     bool excludePrivate = false,
   }) async {
-    final response = await getFile('https://api.github.com/users/${organization.login}/repos');
+    final response = await getFile('https://api.github.com/users/${organization.login}/repos?per_page=100&page=1');
     final jsonResponse = List.castFrom<dynamic, Map>(convert.json.decode(response)).toList();
     // ignore: unnecessary_lambdas
     final result = jsonResponse.map((jsonRepository) => github.Repository.fromJSON(jsonRepository)).where((repository) {
